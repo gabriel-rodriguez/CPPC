@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+
+<cppc-register>
+  <modules>
+    <module file="@prefix@/include/semantic-meta/linux-module.xml"/>
+    <module file="@prefix@/include/semantic-meta/cppc-module.xml"/>
+  </modules>
+</cppc-register>

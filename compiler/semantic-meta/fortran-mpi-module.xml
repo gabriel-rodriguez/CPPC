@@ -1,0 +1,313 @@
+<!--    This file is part of CPPC.
+
+        CPPC is free software; you can redistribute it and/or modify
+        it under the terms of the GNU General Public License as published by
+        the Free Software Foundation; either version 2 of the License, or
+        (at your option) any later version.
+
+        CPPC is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        GNU General Public License for more details.
+
+        You should have received a copy of the GNU General Public License
+        along with CPPC; if not, write to the Free Software
+        Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-->
+
+
+
+
+<cppc-register-module>
+
+  <module name="Message-Passing Interface (MPI), Fortran Version">
+
+    <function name="MPI_ABORT">
+      <input parameters="1,2"/>
+      <output parameters="3"/>
+    </function>
+
+    <function name="MPI_ALLGATHERV">
+      <input parameters="1,2,3,5,6,7,8,9"/>
+      <output parameters="4"/>
+    </function>
+
+    <function name="MPI_ALLREDUCE">
+      <input parameters="1,3,4,5,6"/>
+      <output parameters="2,7"/> <!-- 7 = That's the Fortran IERROR parameter -->
+    </function>
+
+    <function name="MPI_ALLTOALL">
+      <input parameters="1,2,3,5,6,7,8"/>
+      <output parameters="4"/>
+    </function>
+ 
+    <function name="MPI_BARRIER">
+      <input parameters="1"/>
+      <output parameters="2"/> <!-- IERROR -->
+    </function>
+
+    <function name="MPI_BCAST">
+      <input parameters="2,3,4,5"/>
+      <input-output parameters="1"/>
+      <output parameters="6"/> <!-- IERROR -->
+    </function>
+
+    <function name="MPI_COMM_DUP">
+      <input parameters="1"/>
+      <output parameters="2,3"/>
+      <semantics>
+        <semantic role="CPPC/Nonportable"/>
+      </semantics>
+    </function>
+
+    <function name="MPI_COMM_RANK">
+      <input parameters="1"/>
+      <output parameters="2,3"/> <!-- 3 = IERROR -->
+      <semantics>
+        <semantic role="CPPC/Comm/Ranker">
+	  <attribute name="Rank" value="2"/>
+	</semantic>
+      </semantics>
+    </function>
+
+    <function name="MPI_COMM_SIZE">
+      <input parameters="1"/>
+      <output parameters="2,3"/> <!-- 3 = IERROR -->
+      <semantics>
+        <semantic role="CPPC/Comm/Sizer">
+	  <attribute name="Size" value="2"/>
+	</semantic>
+      </semantics>
+    </function>
+
+    <function name="MPI_COMM_SPLIT">
+      <input parameters="1,2,3"/>
+      <output parameters="4, 5"/> <!-- 5 = IERROR -->
+      <semantics>
+        <semantic role="CPPC/Nonportable"/>
+      </semantics>
+    </function>
+
+    <function name="MPI_FILE_CLOSE">
+      <input parameters="1"/>
+      <output parameters="2"/>
+      <semantics>
+        <!-- <semantic role="CPPC/IO/Close"/> --> <!-- No MPI filesystem module is written -->
+        <semantic role="CPPC/Nonportable"/> <!-- Temporary: might serve for some applications -->
+      </semantics>
+    </function>
+
+    <function name="MPI_FILE_DELETE">
+      <input parameters="1,2"/>
+      <output parameters="3"/>
+      <semantics>
+        <semantic role="CPPC/Nonportable"/>
+      </semantics>
+    </function>
+
+    <function name="MPI_FILE_OPEN">
+      <input parameters="2,3,4"/>
+      <output parameters="5,6"/>
+      <semantics>
+        <!-- <semantic role="CPPC/IO/Open"/> --> <!-- No MPI filesystem module is written -->
+	<semantic role="CPPC/Nonportable"/> <!-- Temporary: might serve for some applications -->
+      </semantics>
+    </function>
+
+    <function name="MPI_FILE_READ_AT">
+      <input parameters="1,2,4,5"/>
+      <output parameters="3,6,7"/>
+    </function>
+
+    <function name="MPI_FILE_READ_AT_ALL">
+      <input parameters="1,2,4,5"/>
+      <output parameters="3,6,7"/>
+    </function>
+
+    <function name="MPI_FILE_SET_VIEW">
+      <input parameters="1,2,3,4,5,6"/>
+      <output parameters="7"/>
+    </function>
+
+    <function name="MPI_FILE_WRITE_AT">
+      <input parameters="1,2,3,4,5"/>
+      <output parameters="6,7"/>
+    </function>
+
+    <function name="MPI_FILE_WRITE_AT_ALL">
+      <input parameters="1,2,3,4,5"/>
+      <output parameters="6,7"/>
+    </function>
+
+    <function name="MPI_GATHERV">
+      <input parameters="1,2,3,5,6,7,8,9,10"/>
+      <output parameters="4"/>
+    </function>
+  
+    <function name="MPI_INIT">
+      <output parameters="1"/> <!-- IERROR -->
+      <semantics>
+        <semantic role="CPPC/Comm/Initializer"/>
+      </semantics>
+    </function>
+
+    <function name="MPI_IRECV">
+      <input parameters="2, 3, 4, 5, 6"/>
+      <output parameters="1, 7, 8"/>
+      <!-- FIXME: The first parameter may not be considered as output if we
+           take into account that the receive is non-blocking. Anyway, it is
+	   clearly not an input parameter -->
+      <semantics>
+        <semantic role="CPPC/Comm/Recv">
+          <attribute name="Blocking" value="false"/>
+          <attribute name="Type" value="P2P"/>
+          <attribute name="Buffer" value="1"/>
+          <attribute name="Count" value="2"/>
+          <attribute name="Datatype" value="3"/>
+          <attribute name="Source" value="4"/>
+          <attribute name="Tag" value="5"/>
+          <attribute name="Communicator" value="6"/>
+          <attribute name="Request" value="7"/>
+        </semantic>
+      </semantics>
+    </function>
+
+    <function name="MPI_ISEND">
+      <input parameters="1, 2, 3, 4, 5, 6"/>
+      <output parameters="7,8"/>
+      <semantics>
+        <semantic role="CPPC/Comm/Send">
+	  <attribute name="Blocking" value="false"/>
+	  <attribute name="Type" value="P2P"/>
+	  <attribute name="Buffer" value="1"/>
+	  <attribute name="Count" value="2"/>
+	  <attribute name="Datatype" value="3"/>
+	  <attribute name="Destination" value="4"/>
+	  <attribute name="Tag" value="5"/>
+	  <attribute name="Communicator" value="6"/>
+	  <attribute name="Request" value="7"/>
+	</semantic>
+      </semantics>
+    </function>
+
+    <function name="MPI_FINALIZE">
+      <output parameters="1"/> <!-- IERROR -->
+    </function>
+
+    <function name="MPI_RECV">
+      <input parameters="2,3,4,5,6"/>
+      <output parameters="1,7,8"/>
+      <semantic role="CPPC/Comm/Recv">
+        <attribute name="Blocking" value="true"/>
+        <attribute name="Type" value="P2P"/>
+        <attribute name="Buffer" value="1"/>
+        <attribute name="Count" value="2"/>
+        <attribute name="Datatype" value="3"/>
+        <attribute name="Source" value="4"/>
+        <attribute name="Tag" value="5"/>
+        <attribute name="Communicator" value="6"/>
+      </semantic>
+    </function>
+
+    <function name="MPI_SEND">
+      <input parameters="1,2,3,4,5,6"/>
+      <output parameters="7"/>
+      <semantic role="CPPC/Comm/Send">
+        <attribute name="Blocking" value="true"/>
+	<attribute name="Type" value="P2P"/>
+	<attribute name="Buffer" value="1"/>
+	<attribute name="Count" value="2"/>
+	<attribute name="Datatype" value="3"/>
+	<attribute name="Destination" value="4"/>
+	<attribute name="Tag" value="5"/>
+	<attribute name="Communicator" value="6"/>
+      </semantic>
+    </function>
+
+    <function name="MPI_TYPE_CREATE_SUBARRAY">
+      <input parameters="1,2,3,4,5,6"/>
+      <output parameters="7,8"/>
+      <semantics>
+        <semantic role="CPPC/Nonportable"/>
+      </semantics>
+    </function>
+
+    <function name="MPI_TYPE_HVECTOR">
+      <input parameters="1,2,3,4"/>
+      <output parameters="5,6"/>
+      <semantics>
+        <semantic role="CPPC/Nonportable"/>
+      </semantics>
+    </function>
+
+    <function name="MPI_TYPE_SIZE">
+      <input parameters="1"/>
+      <output parameters="2,3"/>
+    </function>
+
+    <!-- The second parameter of this function is the
+         reception buffer. However, we cannot state that
+	 it is an output parameter, as it will only be
+	 generated by the ROOT process. We mark it as "input"
+	 as a conservative approach -->
+    <function name="MPI_REDUCE">
+      <input parameters="1,3,4,5,6,7"/>
+      <output parameters="2,8"/> <!-- IERROR -->
+    </function>
+
+    <function name="MPI_SCATTERV">
+      <input parameters="1,2,3,4,6,7,8,9,10"/>
+      <output parameters="5"/>
+    </function>
+
+    <function name="MPI_TYPE_COMMIT"> <!-- Don't mark communicator as input, to avoid its registration -->
+      <semantics>
+        <semantic role ="CPPC/Nonportable"/>
+      </semantics>
+    </function>
+
+    <function name="MPI_TYPE_EXTENT"> <!-- Don't mark communicator as input, to avoid its registration -->
+      <output parameters="2"/>
+      <semantics>
+        <semantic role="CPPC/Nonportable"/>
+      </semantics>
+    </function>
+
+    <function name="MPI_TYPE_STRUCT">
+      <input parameters="1,2,3,4"/>
+      <output parameters="5,6"/>
+      <semantics>
+        <semantic role="CPPC/Nonportable"/>
+      </semantics>
+    </function>
+
+    <function name="MPI_WAIT">
+      <input parameters="1"/>
+      <output parameters="2,3"/>
+      <semantics>
+        <semantic role="CPPC/Comm/Wait">
+	  <attribute name="Blocking" value="true"/>
+	  <attribute name="Type" value="P2P"/>
+	  <attribute name="Request" value="1"/>
+	</semantic>
+      </semantics>
+    </function>
+
+    <function name="MPI_WAITALL">
+      <input parameters="1,2"/>
+      <output parameters="3,4"/>
+      <semantics>
+        <semantic role="CPPC/Comm/Wait">
+	  <attribute name="Blocking" value="true"/>
+	  <attribute name="Type" value="Collective"/>
+	  <attribute name="Request" value="2"/>
+	</semantic>
+      </semantics>
+    </function>
+
+    <function name="MPI_WTIME"/>
+
+  </module>
+
+</cppc-register-module>

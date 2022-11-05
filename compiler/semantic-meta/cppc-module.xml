@@ -1,0 +1,57 @@
+<!--    This file is part of CPPC.
+
+        CPPC is free software; you can redistribute it and/or modify
+        it under the terms of the GNU General Public License as published by
+        the Free Software Foundation; either version 2 of the License, or
+        (at your option) any later version.
+
+        CPPC is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        GNU General Public License for more details.
+
+        You should have received a copy of the GNU General Public License
+        along with CPPC; if not, write to the Free Software
+      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-->
+
+
+
+<cppc-register-module>
+  <module name="CPPC functions">
+  
+    <function name="CPPC_Do_checkpoint">
+      <input parameters="1"/>
+    </function>
+    
+    <function name="CPPC_Init_configuration">
+      <input-output parameters="1,2"/>
+    </function>
+
+    <function name="CPPC_Init_state"/>
+    
+    <function name="CPPC_Jump_next"/>
+    
+    <function name="CPPC_Register">
+      <input parameters="1,3,4,5,6"/>
+      <output parameters="2"/>
+      <!-- See CPPC_Register_descriptor annotation-->
+    </function>
+    
+    <function name="CPPC_Register_descriptor">
+      <input parameters="1,3,4"/>
+      <output parameters="2"/>
+       <!-- It is really an input-output one: input on normal execution,
+            output on restart. Restart is all that matters -->
+    </function>
+    
+    <function name="CPPC_Unregister"/>
+    
+    <function name="CPPC_Unregister_descriptor">
+      <input parameters="1"/>
+    </function>
+    
+    <function name="CPPC_Shutdown"/>
+
+  </module>
+</cppc-register-module>

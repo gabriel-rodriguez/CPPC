@@ -1,0 +1,238 @@
+<!--    This file is part of CPPC.
+
+        CPPC is free software; you can redistribute it and/or modify
+        it under the terms of the GNU General Public License as published by
+        the Free Software Foundation; either version 2 of the License, or
+        (at your option) any later version.
+
+        CPPC is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        GNU General Public License for more details.
+
+        You should have received a copy of the GNU General Public License
+        along with CPPC; if not, write to the Free Software
+        Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-->
+
+
+
+
+<cppc-register-module>
+  <module name="Common Fortran functions">
+
+    <function name="ABS">
+      <input parameters="1"/>
+    </function>
+
+    <function name="ACOS">
+      <input parameters="1"/>
+    </function>
+
+    <function name="AINT">
+      <input parameters="1"/>
+    </function>
+
+    <function name="ALOG">
+      <input parameters="1"/>
+    </function>
+
+    <function name="ALOG10">
+      <input parameters="1"/>
+    </function>
+
+    <function name="AMAX1">
+      <input parameters="..."/>
+    </function>
+
+    <function name="AMIN1">
+      <input parameters="..."/>
+    </function>
+
+    <function name="ATAN">
+      <input parameters="1"/>
+    </function>
+
+    <function name="ATAN2">
+      <input parameters="1,2"/>
+    </function>
+
+    <function name="CLOSE">
+      <input parameters="1"/>
+      <semantics>
+        <semantic role="CPPC/IO/Close">
+          <attribute name="LogicalUnit" value="1"/>
+        </semantic>
+      </semantics>
+    </function>
+
+    <function name="COS">
+      <input parameters="1"/>
+    </function>
+
+    <function name="DABS">
+      <input parameters="1"/>
+    </function>
+
+    <function name="DACOS">
+      <input parameters="1"/>
+    </function>
+
+    <function name="DASIN">
+      <input parameters="1"/>
+    </function>
+
+    <function name="DBLE">
+      <input parameters="1"/>
+    </function>
+
+    <function name="DCMPLX">
+      <input parameters="1,2"/>
+    </function>
+
+    <function name="DCONJG">
+      <input parameters="1"/>
+    </function>
+
+    <function name="DCOS">
+      <input parameters="1"/>
+    </function>
+
+    <function name="DEXP">
+      <input parameters="1"/>
+    </function>
+
+    <function name="DFLOAT">
+      <input parameters="1"/>
+    </function>
+
+    <function name="DIMAG">
+      <input parameters="1"/>
+    </function>
+
+    <function name="DINT">
+      <input parameters="1"/>
+    </function>
+
+    <function name="DMAX1">
+      <input parameters="..."/>
+    </function>
+
+    <function name="DSIGN">
+      <input parameters="1,2"/>
+    </function>
+
+    <function name="DSIN">
+      <input parameters="1"/>
+    </function>
+
+    <function name="DSQRT">
+      <input parameters="1"/>
+    </function>
+
+    <function name="EXIT">
+      <input parameters="1"/>
+    </function>
+
+    <function name="EXP">
+      <input parameters="1"/>
+    </function>
+
+    <function name="FLOAT">
+      <input parameters="1"/>
+    </function>
+
+    <function name="FLUSH"/>
+
+    <function name="FSEEK">
+      <input parameters="1,2,3"/>
+    </function>
+
+    <function name="GOTO">
+      <input parameters="1"/>
+    </function>
+
+    <function name="ICHAR">
+      <input parameters="1"/>
+    </function>
+
+    <function name="INT">
+      <input parameters="1"/>
+    </function>
+
+    <function name="LOG">
+      <input parameters="1"/>
+    </function>
+
+    <function name="MAX">
+      <input parameters="..."/>
+    </function>
+
+    <function name="MAX0">
+      <input parameters="..."/>
+    </function>
+
+    <function name="MIN">
+      <input parameters="..."/>
+    </function>
+
+    <function name="MOD">
+      <input parameters="1,2"/>
+    </function>
+
+    <function name="OPEN">
+      <input parameters="..."/>
+      <semantics>
+        <semantic role="CPPC/IO/Open">
+          <attribute name="LogicalUnit" value="1"/>
+          <attribute name="Path" value="2"/>
+	  <attribute name="Status" value="IOSTAT"/>
+        </semantic>
+      </semantics>
+    </function>
+
+    <function name="PAUSE">
+      <input parameters="..."/>
+    </function>
+
+    <function name="PRINT">
+      <input parameters="..."/>
+    </function>
+
+    <function name="RAND">
+      <input parameters="1"/>
+    </function>
+
+    <function name="READ">
+      <input parameters="1,2"/>
+      <output parameters="..."/>
+    </function>
+
+    <function name="REAL">
+      <input parameters="1"/>
+    </function>
+
+    <function name="SIN">
+      <input parameters="1"/>
+    </function>
+
+    <function name="SQRT">
+      <input parameters="1"/>
+    </function>
+
+    <function name="SRAND">
+      <input parameters="1"/>
+    </function>
+
+    <function name="STOP"/>
+
+    <function name="TAN">
+      <input parameters="1"/>
+    </function>
+
+    <function name="WRITE">
+      <input parameters="..."/>
+    </function>
+
+  </module>
+</cppc-register-module>

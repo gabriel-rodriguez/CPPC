@@ -1,0 +1,174 @@
+<?xml version="1.0"?>
+
+<!--  This file is part of CPPC.
+
+      CPPC is free software; you can redistribute it and/or modify
+      it under the terms of the GNU General Public License as published by
+      the Free Software Foundation; either version 2 of the License, or
+      (at your option) any later version.
+
+      CPPC is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU General Public License for more details.
+
+      You should have received a copy of the GNU General Public License
+      along with CPPC; if not, write to the Free Software
+      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-->
+
+<!DOCTYPE project [
+    <!ENTITY CommonProperties SYSTEM "CommonProperties.xml">
+    <!ENTITY CommonPathReferences SYSTEM "CommonPathReferences.xml">
+    <!ENTITY CommonTasks SYSTEM "file:CommonTasks.xml">
+]>
+
+<!-- ====================================================================== -->
+<!--			CPPCC build file				    -->
+<!-- ====================================================================== -->
+
+<project name="CPPCC" default="compile" basedir=".">
+
+<!-- ============================  Properties ============================== -->
+
+    <property name="cppcc.home" value="${basedir}/"/>
+
+    &CommonProperties;
+    &CommonPathReferences;
+
+<!--
+    <property name="mem.scripts" value="${mem.home}/Scripts"/>
+    <property name="mem.htmlview" value="${mem.sources}/HTMLView"/>
+-->
+    <property name="cppcc.build" value="${cppcc.home}/Build"/>
+    <property name="cppcc.classes" value="${cppcc.build}/Classes"/>
+    <property name="cppcc.jars" value="${cppcc.build}/Jars"/>
+    <property name="cppcc.compilerjar" value="cppcc.jar"/>
+<!--    
+    <property name="mem.wars" value="${mem.build}/Wars"/>
+    <property name="mem.webappname" value="ServicioMEM"/>
+    <property name="mem.serviceurl"
+              value="http://${ws.host}:${ws.port}/${mem.webappname}/services/ServicioMEM"/>
+    <property name="mem.adminserviceurl"
+              value="http://${ws.host}:${ws.port}/${mem.webappname}/services/AdminService"/>
+    <property name="mem.servicewsdl" value="${mem.sources}/cdistr/mem/wsdl/ServicioMEM.wsdl"/>
+    <property name="mem.servicewsdd" value="${mem.sources}/cdistr/mem/wsdl/deploy.wsdd"/>
+    <property name="mem.wsjar" value="WSMEM.jar"/>
+    <property name="mem.wsclientjar" value="WSMEMClient.jar"/>
+    <property name="mem.wswar" value="WSMEM.war"/>
+    <property name="mem.wsclientwar" value="WSMEMClient.war"/>
+    <property name="portal.backupextension" value="~"/>
+-->
+
+<!-- ============================ "init" target ============================ -->
+
+    <target name="init">
+        <echo>
+--------------------------------------------------------------------------------
+Running build file for entire project ...
+--------------------------------------------------------------------------------
+        </echo>
+    </target>
+
+<!-- ============================ "compile" target ========================= -->
+
+    <target name="compile" depends="init">
+	<mkdir dir="${cppcc.classes}"/>
+        <javac 
+            srcdir="${cppcc.sources}"
+            destdir="${cppcc.classes}"
+            classpathref="cppcc.classpath"
+            debug="${javac.debug}"
+            optimize="${javac.optimize}"
+            deprecation="${javac.deprecation}"/>
+    </target>
+
+<!-- ============================ "rebuild" target ========================= -->
+
+    <target name="rebuild" depends="cleanclasses,compile"/>
+
+<!-- ============================ "clean" target =========================== -->
+
+    <target name="clean" depends="init">
+	<delete dir="${cppcc.build}"/>
+    </target>
+
+<!-- ============================ "cleanclasses" target ==================== -->
+
+    <target name="cleanclasses" depends="init">
+	<delete dir="${cppcc.classes}"/>
+    </target>
+
+<!-- ============================ "jar" target ============================= -->
+
+    <target name="jar" depends="compile">
+      <mkdir dir="${cppcc.jars}"/>
+      <jar jarfile="${cppcc.jars}/${cppcc.compilerjar}"
+           basedir="${cppcc.classes}"
+	   includes="**/*.class"/>
+    </target>
+
+<!-- ================= WS HTTP Client JAR, WAR and deploy targets ========== -->
+
+<!--
+    <target name="wsclientjar" depends="compile">
+        <mkdir dir="${mem.jars}"/>
+	<jar jarfile="${mem.jars}/${mem.wsclientjar}"
+	     basedir="${mem.classes}"
+	     includes="cdistr/mem/client/http/controller/ControladorMEM.class,
+	     	       cdistr/mem/client/proxy/ServicioMEMProxy.class
+		       cdistr/mem/wsdl/ServicioMEM.class,
+		       cdistr/mem/wsdl/ServicioMEMService.class,
+		       cdistr/mem/wsdl/ServicioMEMServiceLocator.class,
+		       cdistr/mem/wsdl/ServicioMEMSoapBindingStub.class,
+		       cdistr/mem/wsdl/WSDLConversor.class,
+		       cdistr/mem/wsdl/InstanceNotFoundException.class,
+		       cdistr/mem/wsdl/InternalErrorException.class,
+		       cdistr/mem/util/exceptions/InstanceNotFoundException.class,
+		       cdistr/mem/util/exceptions/InternalErrorException.class"/>
+    </target>
+
+    <target name="wsclientwar" depends="wsclientjar">
+        <mkdir dir="${mem.wars}"/>
+	<war warfile="${mem.wars}/${mem.wsclientwar}"
+	     webxml="${mem.htmlview}/WEB-INF/Client/web.xml">
+	     <lib dir="${mem.jars}" includes="${mem.wsclientjar}"/>
+	     <lib dir="${axis.lib}" includes="${axis.jars}"/>
+	     <fileset dir="${mem.htmlview}/HTML"
+	              excludes="**/*${mem.backupextension}"/>
+	     <fileset dir="${mem.htmlview}/Images"
+	              excludes="**/*${mem.backupextension}"/>
+	</war>
+    </target>
+
+    <target name="deploywsclientwar" depends="wsclientwar">
+      <delete dir="${tomcat.webapps}/${mem.webappname}Client"/>
+      <mkdir dir="${tomcat.webapps}/${mem.webappname}Client"/>
+      <unwar src="${mem.wars}/${mem.wsclientwar}"
+             dest="${tomcat.webapps}/${mem.webappname}Client"/>
+    </target>
+-->
+
+<!-- ============================ Test targets ============================= -->    
+
+    <!-- Test the DAOs and DB access -->
+<!--    
+    <target name="test" depends="compile">
+	<java fork="yes" classpathref="mem.classpath"
+	    classname="cdistr.mem.model.productfacade.delegate.ProductFacadeDelegateFactory"/>
+    </target>
+-->
+
+    <!-- Test the Web Service using a plain client -->
+<!--
+    <target name="testplainclient" depends="compile">
+        <java fork="yes" classpathref="mem.classpath"
+	    classname="cdistr.mem.client.plain.ClienteMEM">
+	    <arg value="precios"/>
+	    <arg value="chorizos"/>
+	    <arg value="baja"/>
+	</java>
+    </target>
+-->
+
+</project>

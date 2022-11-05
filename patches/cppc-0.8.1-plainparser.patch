@@ -1,0 +1,38 @@
+--- init_configuration_action.old	2017-07-03 10:15:36.679239194 +0200
++++ init_configuration_action.cpp	2017-07-03 10:19:54.255915866 +0200
+@@ -20,6 +20,8 @@
+ #include <controller/actions/init_configuration_action.h>
+ #include <data/heap_context.h>
+ #include <util/configuration/configuration_manager.h>
++#include <util/xml/plain_parser.h>
++#include <util/xml/xml_parser_factory.h>
+ 
+ #include <cassert>
+ 
+@@ -27,6 +29,8 @@
+ using cppc::util::configuration::ConfigurationManager;
+ using cppc::util::configuration::ParameterType;
+ using cppc::util::configuration::ParameterVector;
++using cppc::util::xml::PlainParser;
++using cppc::util::xml::XmlParserFactory;
+ 
+ namespace cppc {
+   namespace controller {
+@@ -58,10 +62,17 @@
+ 
+       InitConfigurationAction::~InitConfigurationAction() {}
+ 
++      XmlParser * createPlainParser() {
++          return new PlainParser();
++      }
++
+       int InitConfigurationAction::execute() {
+ 
+         assert( !controllerState.initConfig );
+ 
++        // Register plain parser (ad-hoc fix)
++        XmlParserFactory::instance().registerParser( PlainParser::staticParserType(), createPlainParser );
++
+         // Initialization of the ConfigurationManager
+         initConfigurationManager( argsno, args );
+ 

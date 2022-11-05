@@ -1,0 +1,451 @@
+0.8.1 -> 13/11/2012
+	* Zero-blocks (blocks of memory of 4112 bytes each containing only zeros) are now automatically compressed during runtime.
+	* Fixed bug that caused the generation of incorrect incremental checkpoints during a restart.
+	* Fixed several bugs in the Fortran compiler.
+	* Modified the control flow analysis to follow the dependence graph. This should improve registration places for global variables.
+	* Removed debug output from the compiler and the runtime system.
+
+0.8.0 -> 01/10/2012
+	  General
+	  -------
+
+	* Added incremental checkpointing support.
+	* Greatly reduced memory footprint during checkpoint file creation.
+	* Multithreading is always used and is no longer a configuration option.
+	* Fixed bug with open files (FILE*) during restart.
+	* Removed support for HDF5 versions older than v1.8.
+	* Added support for OpenMPI v1.4.
+	* The library now requires OpenSSL, used for memory hashing.
+
+0.7.2 -> 03/05/2010
+          General
+	  -------
+	
+	* Added support for HDF-5 v1.8.
+	* General bugfixes to the build system to improve portability.
+
+	  Compiler
+	  --------
+
+	* Added support for empty strings in Fortran 77.
+	* Added support for the C "putenv()" function.
+	* Fixed the calculation of cost heuristics for if statements.
+	* Fixed a bug related to heuristic analysis of loop statements.
+
+	  Runtime
+	  -------
+	
+	* Fixed bug related to the insertion of non-portable statements inside
+	  loops.
+
+0.7.1 -> 02/03/2009
+          General
+	  -------
+
+	* Integration with GNU Autotools. This should reduce compilation and
+	  portability issues to a minimum.
+
+0.7.0 -> 26/02/2009
+	  Compiler
+	  --------
+
+	* Improved support for automatic checkpoint insertion and
+	  communication analysis. The analyses should run significantly faster,
+	  too.
+	* The number of processes that will execute the parallel code can now
+	  be supplied to the compiler via the "-nodes" command-line parameter.
+	  This improves the communication analysis.
+	* MPI_Waitall() now supported by the compiler.
+	* Added semantic support for the following Fortran 77 built-in
+	  functions:
+	  - ALOG
+	  - ALOG10
+	  - AMAX1
+	  - AMIN1
+	  - DACOS
+	  - DASIN
+	  - DCMPLX
+	  - DCONJG
+	  - DCOS
+	  - DEXP
+	  - DIMAG
+	  - DSIN
+	  - FSEEK
+	  - MAX0
+	  - RAND
+	  - SRAND
+	* Added semantic info for the following Linux functions:
+	  - ctime
+	  - fgets
+	  - localtime
+	  - memcpy
+	  - memset
+	  - realloc
+	  - scanf
+	  - sscanf
+	  - strftime
+	  - strstr
+	  - toupper
+	* Added semantic info for the following MPI functions:
+	  - MPI_Abort
+	  - MPI_Error_string
+	* Added support for COMPLEX Fortran 77 datatypes.
+	
+	  Library
+	  -------
+	* The code should now compile without errors on a wider range of C++
+	  compilers, including GCC v4.3 (which introduces FSEEK support in
+	  gfortran).
+
+	  General
+	  -------
+	* The parser now allows function calls with no parameters to be made
+	  using the "CALL NAME()" format, in addition to "CALL NAME".
+	* Several miscellaneous bugfixes.
+	* Slightly improved build system. The integration with the GNU
+	  Autotools is not yet complete.
+
+	
+
+0.6.1 -> 14/01/2008
+	  Compiler
+	  --------
+
+	* cppc_cc now accepts multiple C files as input.
+	* Added semantic support for the following Linux functions:
+	  - cosh
+	  - exp
+	  - feof
+	  - fflush
+	  - fgetc
+	  - fread
+	  - isunordered
+	  - log
+	  - pow
+	  - sinh
+	  - sleep
+	  - sqrt
+	  - srand48
+	  - strcat
+	  - strcmp
+	  - strcpy
+	  - strncat
+	  - system
+	  - time
+	* Fixed bug that could cause a ClassCastException when analyzing C
+	  switch statements.
+	* Added compiler support for escape literals (e.g. '\0').
+	* Fixed bug that could cause live arrays not to be registered if they
+	  were passed to a function that modified some, but not all, of their
+	  elements.
+	* Added support for Fortran computed gotos.
+	* Addressed bug present in some JDKs that could cause a
+	  NumberFormatException when parsing integer literals beginning with
+	  "+".
+	* Fixed bug that caused the compiler to perform incorrect
+	  transformations when dealing with file-opening functions using
+	  expressions to represent the file path.
+	* Fixed bug that would raise a NullPointerException when trying to
+	  register a C global variable, defined outside of any procedure
+	  scope.
+	* Fixed bug that could raise a ClassCastException when compiling
+	  Fortran 77 applications with substantially different definitions of
+	  the same COMMON block.
+
+	  Runtime
+	  -------
+	* Fixed code generation routines and HDF-5 plugin bugs which could
+	  make the re-execution flow enter an infinite loop.
+	* Fixed bug which could cause files not to be correctly reopened upon
+	  application restart.
+	* Fixed bug which could cause incorrect recovery on big endian
+	  machines.
+
+	  General
+	  -------
+
+	* Added preliminary support for user-defined datatypes. Currently,
+	  typedefs renaming basic types are recognized.
+
+
+0.6   -> 19/07/2007
+
+	  Compiler
+	  --------
+	* Added experimental support for automatic checkpoint insertion. The
+	  compiler tries to identify computation-intensive loops to place
+	  checkpoints. This analysis con be turned off using the -nockpt
+	  compiler option. If deactivated, checkpoints have to be manually
+	  placed.
+	* Added experimental support for communication analysis. This enables
+	  automatic detection of safe points for checkpoint insertion. This
+	  analysis can be turned off using the -nocomms compiler option. If
+	  deactivated, all code points are assumed to be safe.
+	* Checkpoints can be manually placed by using the  checkpoint
+	  directive, or the newly added  checkpoint loop directive. The latter
+	  is placed before a loop, and tells the compiler to insert a checkpoint
+	  in the first safe point inside the loop body. If using manually
+	  inserted directives, the compiler option -manual needs to be inserted.
+	* The compiler will no longer handle manually placed  init, shutdown,
+	  register, nor unregister directives. The only directives being
+	  processed as of v0.6 are  checkpoint, checkpoint loop and execute/end
+	  execute.a
+	* The compiler is now able to handle CPPC code inserted inside
+	  conditional statements. The conditional expression is re-executed at
+	  restart, and each process will execute its corresponding RECs.
+	* Global variables which were originally unscoped at the register
+	  point will have its declaration copied over to the register procedure
+	  to avoid compiling errors and prevent users from having to insert said
+	  declarations manually.
+	* Improved interprocedural data flow analyses. The register/unregister
+	  insertion algorithm is now more reliable.
+	* The include file for the CPPC library is now automatically inserted
+	  by the CPPC compiler.
+	* Improved both C and Fortran 77 parsers.
+	* Improved Fortran 77 code generation to preserve the original I/O
+	  formats.
+	* Improved code generation to avoid different bugs when compiling the
+	  CPPC output.
+	* Improved error output from the compiler.
+	* Added functions DSIGN, ICHAR and PAUSE to the Fortran semantic
+	  catalogue.
+	* Fixed functions MPI_FILE_OPEN and MPI_INIT in the Fortran MPI
+	  semantic catalogue. Added communication semantics for MPI_IRECV,
+	  MPI_ISEND, MPI_WAIT and MPI_WAITALL.
+	* Added function read() to the C semantic catalogue.
+	* The compiler is now able to properly handle file opening functions
+	  placed in C initializers.
+	* Fixed CPPC_Shutdown insertion to avoid placing it after a return
+	  statement.
+	* Fixed several miscellaneous bugs.
+
+	  Runtime
+	  -------
+	* Unregister blocks are no longer re-executed at restart. This was not
+	  necessary and will slightly improve runtime performance.
+	* Fixed bug that caused data needed by non-portable function calls not
+	  to be recovered upon restart, which could mean restart failures.
+	* Removed debugging output.
+	
+	  Miscellaneous
+	  -------------
+	* Fixed the example code to work with the current release (thanks,
+	  Jacobo ;-)
+
+0.5.2 -> 24/04/2007
+
+	  Compiler
+	  --------
+	* Changed Cetus infrastructure to version 0.5. This improves the
+	  C compiler.
+	* Improved appearance of Fortran generated code.
+
+	  Parser
+	  ------
+	* Fixed a bug in fortran-cppc-modules.xml which could cause an exception
+	  in initializer error.
+	* Added support for computed goto's to the Fortran Compiler.
+	* Added support for generating DO WHILE...END DO structures in Fortran
+	  (which were accepted by the frontend but not correctly written by the
+	  backend).
+
+	  Analysis
+	  -------
+	* Improved data flow analyses to avoid registering arrays which are
+	  fully generated before being used (via pointer assignment in C, or a
+	  loop matching their size in both C and Fortran).
+	* Improved data flow analyses to avoid registering full a whole common
+	  block when only some of its variables are live.
+	* Improved global variables management to avoid double registrations,
+	  which could cause a segmentation fault at runtime.
+	* Corrected bug in data flow analyses which could cause a variable
+	  generated inside a conditional to be considered generated outside
+	  the conditional block (which could cause necessary registers not to
+	  be inserted).
+
+	  Compile time
+	  ------------
+	* Fixed bug which could cause the library to try to delete /usr/local
+	  when running "make install".
+	* Fixed bug which could cause errors when linking with the HDF5
+	  shared library.
+
+	  Run time
+	  --------
+	* Fixed minor memory leaks.
+	* Added user-friendly messages regarding errors when trying to restart
+	  an application.
+
+0.5.1 -> 15/01/2007
+
+	  Parser
+	  ------
+	* Added support for numeric literals starting with "+" (e.g., +1.00)
+	  to the Fortran Compiler.
+	* Corrected bug which could insert labels in empty lines when
+	  generating Fortran 77 code.
+	* Corrected placement of the INCLUDE directives, which could
+	  cause compilation errors due to code being preparsed before the
+	  IMPLICIT statement.
+
+	  Analysis
+	  --------
+	* Added semantic information for the Fortran 77 version of the MPI_RECV
+	  function.
+	* Added a check for duplicate entry points (multiple "main" methods),
+	  a situation that could cause the compiler to malfunction.
+	* Improved variable registration routines when checkpoints are placed
+	  in a subroutine different from the "main" procedure. The number of
+	  registers inserted might grow up a bit, but the set of registered
+	  variables is much more reliable.
+	* Added support for data flow analysis of pre-increment (++var) and
+	  pre-decrement (--var) C operators.
+	* Added support for data flow analysis of "break;" and "switch( ... )"
+	  C statements.
+	* Fixed a bug that could cause a null pointer exception upon analysis
+	  of C "for" loops with complex conditions/steps.
+	* Further removed debugging output.
+
+	  Compile time
+	  ------------
+	* Fixed a Makefile bug which could cause interface compilation to
+	  complain about missing definitions.
+
+	  Runtime
+	  -------
+	* Corrected a bug that could cause an Internal Error on certain Java
+	  VMs.
+	* Tuned the memory reserved by the Java VM to avoid heap overflow
+	  exceptions and/or long runtimes when parsing large codes (over around
+	  5,000 lines of code). This dramatically improves compile time when
+	  dealing with such applications.
+	* Fixed a bug which could cause the library to enter an infinite loop
+	  when restarting an application if the MPI_Init function call was
+	  placed in a non-main subroutine.
+
+
+0.5 -> 30/11/2006
+
+	  Parser
+	  ------
+	* Automatic insertion of execute ... end execute directives
+	  introduced. The compiler uses semantic information to detect
+	  functions with non portable outcome, and logs their parameters to
+	  achieve an exact copy of the function call upon application restart.
+	  Note that this "parameter logging" is a "by value" version of the
+	  variable registration, which works "by reference" (storing the
+	  address for value dumping upon checkpoint instead of directly
+	  storing its value).
+	* The compiler code has been tuned to achieve a much better
+	  efficiency. Execution times reduced a 97%.
+	* Added support for Fortran DO WHILE .... END DO loops.
+	* Added support for "double" literals to the Fortran compiler (i.e.,
+	  literals like "1.0d0" were translated as "1.0e0" in previous
+	  versions which caused wrong results in some applications).
+	* Added support for ENDIF and ENDDO terminations.
+	* Code generation improved, avoiding the insertion of conditional
+	  jumps and jump labels between adjacent blocks of code.
+
+	  Analysis
+	  --------
+	* Improved register detection routine for correctly detecting
+	  variables needed when a "parent" procedure makes a call to another
+	  one which contains the checkpoint directive. Variables needed upon
+	  return of the "children" function are now registered.
+	* Improved register detection routine for correctly recognizing
+	  variable values generated at variable initialization.
+	* Improved register creation routine to avoid placing registers inside
+	  loops, improving execution overhead.
+	* Improved the analysis for insertion of the CPPC initialization
+	  routines. Now the library should correctly deal with procedures
+	  not having their comm init (e.g., MPI_Init) at the beginning of the
+	  entry procedure.
+	* Improved the file tracking analyses to check the status of a file
+	  opening if the checkpointed application checks it.
+	* The Fortran compiler will now automatically place an "include"
+	  declaration for the CPPC headers on relevant subroutines.
+	* Removed debugging output to allow for a more "user-friendly"
+	  execution.
+	* Corrected bug that could cause an IllegalArgumentException to be
+	  thrown when inserting the shutdown directive.
+	* Corrected bug that could cause wrong conditional jump/jump label
+	  placement.
+	* Corrected bug that could cause wrong declaration statement
+	  placement.
+
+	  Library
+	  -------
+	* The library now uses execution context tracing to associate
+	  registers and checkpoints. This system supports complex function
+	  call sequences (including any level of recursive calls) and is
+	  designed to add a very low overhead and only when a call contains
+	  CPPC code. Calls to functions not CPPC-related are not traced.
+	* The library interface code automatically detects the mangling scheme
+	  used by the Fortran compiler, avoiding linking errors due to symbols
+	  not being found.
+	* Corrected bug that could cause problems when removing aliasing
+	  registers.
+	* Removed binary writer from the distribution, since it didn't have
+	  any reasonable advantage over the provided HDF-5 version.
+
+	  Runtime
+	  -------
+	* The Fortran compiler (cppc_fc) now supports -I <dir> (adds <dir> to
+	  the include search path) and -o <dir> (places the output files in
+	  directory <dir>).
+
+0.4.1 -> 3/11/2006
+	* Adapted IOHdf5Writer code to work with GCC 4.x.
+
+0.4 -> 21/02/2006
+	* A portable system and format for storing pointers is now used in the
+	  runtime library. It detects and supports aliasing between registered
+	  variables. This format allows for a recovery that preserves the
+	  original data overlap.
+	* Corrected a bug that made the runtime library overwrite the
+	  checkpoint file used for a restart when another state file was
+	  created.
+	* Removed a synchronization barrier when calling CPPC_Shutdown().
+	* Corrected a bug that could cause data corruption on state files
+	  depending on the size of the data being stored.
+	* The precompiler has now an option to begin its execution using the
+	  'jdb' debugger.
+	* Corrected live-variable analysis when a checkpoint is placed inside
+	  a loop.
+	* Corrected an issue with jump indexing when automatically inserting
+	  code in Fortran 77.
+	* Corrected misplacement of CPPC_IERROR_VAR when the init directive
+	  was the first Statement in a Fortran 77 code.
+	* Corrected a bug when dealing with arrays of strings in Fortran 77.
+	* The Fortran 77 precompiler does now recognize the 'REAL' intrinsic.
+	* Removed meaningless and syntactically incorrect 'unregister'
+	  directives.
+	* The precompiler does no longer insert empty RECs before 'execute' or
+	  checkpoint directives when no variables need to be registered.
+	* The precompiler does no longer insert an empty label in the end of
+	  annotated procedures in Fortran 77.
+	* General improvements to Fortran 77 code structure.
+	* Added code for supporting semantic analysis based on information
+	  provided through XML descriptions of functions.
+	* Added semantic analysis for automatically detecting and dealing with
+	  open files in C and Fortran 77.
+	* Improved library routines and structures for dealing with open files
+	  in a portable way.
+	* Added semantic analysis for automatically inserting the 'init'
+	  directive.
+	* Added syntactic analysis for automatically inserting the shutdown
+	  directive.
+
+0.3 -> 06/10/2005
+	* Added the PlainParser so that Xerces-C is not needed anymore.
+	* Enabled the automatic analysis options in the precompiler.
+	* Corrected minor bug in the Fortran parser when recognising
+	  Fortran 77 built-in functions.
+	* Corrected bug in the C variable size analyzer in the precompiler.
+	  Character arrays were not registered with enough space for the
+	  '\0' terminating character.
+	* Automatic registration of global variables now works.
+	* Corrected minor bug in the precompiler which could cause the
+	  execution to cause a SIGSEGV under certain circumstances.
+
+0.2 -> First Public Release

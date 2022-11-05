@@ -1,0 +1,275 @@
+<!--    This file is part of CPPC.
+
+        CPPC is free software; you can redistribute it and/or modify
+        it under the terms of the GNU General Public License as published by
+        the Free Software Foundation; either version 2 of the License, or
+        (at your option) any later version.
+
+        CPPC is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        GNU General Public License for more details.
+
+        You should have received a copy of the GNU General Public License
+        along with CPPC; if not, write to the Free Software
+        Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-->
+
+
+
+
+<cppc-register-module>
+  <module name="Common Linux/UNIX OS functions">
+
+    <function name="atoi">
+      <input parameters="1"/>
+    </function>
+
+    <function name="close">
+      <input parameters="1"/>
+      <semantics>
+        <semantic role="CPPC/IO/Close">
+          <attribute name="FileDescriptor" value="1"/>
+        </semantic>
+      </semantics>
+    </function>
+
+    <function name="cosh">
+      <input parameters="1"/>
+    </function>
+
+    <function name="ctime">
+      <input parameters="1"/>
+    </function>
+
+    <function name="exit">
+      <input parameters="1"/>
+    </function>
+
+    <function name="exp">
+      <input parameters="1"/>
+    </function>
+
+    <function name="fabs">
+      <input parameters="1"/>
+    </function>
+
+    <function name="fclose"> <!-- Parameter handled by the I/O system -->
+      <semantics>
+        <semantic role="CPPC/IO/Close">
+          <attribute name="FileDescriptor" value="1"/>
+        </semantic>
+      </semantics>
+    </function>
+
+    <function name="fdopen">
+      <input parameters="1,2"/>
+    </function>
+
+    <function name="feof">
+      <input parameters="1"/>
+    </function>
+
+    <function name="fflush">
+      <input parameters="1"/>
+    </function>
+
+    <function name="fgetc">
+      <input parameters="1"/>
+    </function>
+
+    <function name="fgets">
+      <input parameters="2,3"/>
+      <output parameters="1"/>
+    </function>
+
+    <function name="fopen">
+      <input parameters="1,2"/>
+      <semantics>
+        <semantic role="CPPC/IO/Open">
+          <attribute name="FileDescriptor" value="return"/>
+          <attribute name="Path" value="1"/>
+          <attribute name="DescriptorType" value="CPPC_UNIX_FILE"/>
+        </semantic>
+      </semantics>
+    </function>
+
+    <function name="fprintf">
+      <input parameters="1,2,..."/>
+    </function>
+
+    <function name="fread">
+      <input parameters="2,3"/> <!-- FILE * recovered by I/O system -->
+      <output parameters="1"/>
+    </function>
+
+    <function name="free">
+      <input-output parameters="1"/>
+    </function>
+
+    <function name="fscanf">
+      <input parameters="1,2"/>
+      <output parameters="..."/>
+    </function>
+
+    <function name="getchar"/>
+
+    <function name="gettimeofday">
+      <output parameters="1,2"/>
+    </function>
+
+    <function name="isunordered">
+      <input parameters="1,2"/>
+    </function>
+
+    <function name="localtime">
+      <input parameters="1"/>
+    </function>
+
+    <function name="log">
+      <input parameters="1"/>
+    </function>
+
+    <function name="lrand48"/>
+
+    <function name="malloc">
+      <input parameters="1"/>
+    </function>
+
+    <function name="memcpy">
+      <input parameters="2,3"/>
+      <input parameters="1"/>
+    </function>
+
+    <function name="memset">
+      <input parameters="2,3"/>
+      <input-output parameters="1"/>
+    </function>
+
+    <function name="open">
+      <input parameters="1,2"/>
+      <semantics>
+        <semantic role="CPPC/IO/Open">
+          <attribute name="FileDescriptor" value="return"/>
+          <attribute name="Path" value="1"/>
+          <attribute name="DescriptorType" value="CPPC_UNIX_FD"/>
+        </semantic>
+      </semantics>
+    </function>
+
+    <function name="perror">
+      <input parameters="1"/>
+    </function>
+
+    <function name="pow">
+      <input parameters="1,2"/>
+    </function>
+
+    <function name="printf">
+      <input parameters="1,..."/>
+    </function>
+
+    <function name="putenv">
+      <input parameters="1"/>
+    </function>
+
+    <function name="rand"/>
+
+    <function name="read">
+      <input parameters="1,3"/>
+      <output parameters="2"/>
+    </function>
+
+    <function name="realloc">
+      <input parameters="1,2"/>
+    </function>
+
+    <function name="rewind">
+      <input parameters="1"/>
+    </function>
+
+    <function name="scanf">
+      <input parameters="1"/>
+      <output parameters="..."/>
+    </function>
+
+    <function name="sinh">
+      <input parameters="1"/>
+    </function>
+
+    <function name="sleep">
+      <input parameters="1"/>
+    </function>
+
+    <function name="sprintf">
+      <output parameters="1"/>
+      <input parameters="2,..."/>
+    </function>
+
+    <function name="sqrt">
+      <input parameters="1"/>
+    </function>
+
+    <function name="srand">
+      <input parameters="1"/>
+    </function>
+
+    <function name="srand48">
+      <input parameters="1"/>
+    </function>
+
+    <function name="sscanf">
+      <input parameters="1,2"/>
+      <output parameters="..."/>
+    </function>
+
+    <function name="strcat">
+      <input parameters="2"/>
+      <input-output parameters="1"/>
+    </function>
+
+    <function name="strcmp">
+      <input parameters="1,2"/>
+    </function>
+
+    <function name="strcpy">
+      <input parameters="2"/>
+      <input-output parameters="1"/>
+    </function>
+
+    <function name="strftime">
+      <input parameters="2,3,4"/>
+      <output parameters="1"/>
+    </function>
+
+    <function name="strlen">
+      <input parameters="1"/>
+    </function>
+
+    <function name="strncat">
+      <input parameters="2,3"/>
+      <input-output parameters="1"/>
+    </function>
+
+    <function name="strstr">
+      <input parameters="1,2"/>
+    </function>
+
+    <function name="system">
+      <input parameters="1"/>
+    </function>
+
+    <function name="time">
+      <output parameters="1"/>
+    </function>
+
+    <function name="toupper">
+      <input parameters="1"/>
+    </function>
+
+    <function name="unlink">
+      <input parameters="1"/>
+    </function>
+
+  </module>
+</cppc-register-module>

@@ -1,0 +1,107 @@
+#    This file is part of CPPC.
+#
+#    CPPC is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    CPPC is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with CPPC; if not, write to the Free Software
+#    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+
+#!/bin/sh -f
+
+CLASSPATH="@prefix@/lib/antlr.jar:@prefix@/lib/cetus-cppc.jar:@prefix@/lib/cppcc.jar"
+CCCLASS=cppc.compiler.Compiler
+JAVA=java
+
+usage() {
+        echo "Usage: cppc_cc [options] file...";
+        echo "Options:";
+        echo "-debug  : Enables Java debugger (jdb).";
+        echo "-I dir  : Add dir to the list of directories to be searched for header files.";
+        echo "-o dir  : Write output to directory dir.";
+        echo "-g file : Path to file containing a list of semantic modules to be imported.";
+        echo "-manual : Translate manually placed directives.";
+        echo "-nocomms: Do not perform communication analyses.";
+        echo "-nockpts: Do not insert checkpoints automatically (used together with";
+        echo "          -manual to enable manual checkpoint directives only)."
+        echo "-nodes n: Number of processes to execute the application.";
+	exit 1;
+}
+
+process_flags() {
+while [ ! -z "$1" ];
+  do case x"$1" in
+    x-o) shift
+         if [ -z $1 ]
+            then usage; fi
+         outputdir=$1
+         shift;;
+    x-I*) 
+      if [ x"$1" = "x-I" ]
+      then
+        shift
+	includes="${includes} -I$1"
+      else
+        includes="${includes} $1"
+      fi
+      shift;;
+    x-g) shift
+         if [ -z $1 ]
+	   then usage; fi
+	 grimoire=$1
+	 shift;;
+    x-debug) JAVA="jdb"
+             shift;;
+    x-manual) add_cppcattr "ManualPragmas=true";
+              shift;;
+    x-nocomms) add_cppcattr "DisableCommAnalysis=true";
+              shift;;
+    x-nockpts) add_cppcattr "DisableCkptAnalysis=true";
+              shift;;
+    x-nodes) add_cppcattr "ProcessNumber=$2";
+             shift;
+             shift;;
+    x-*) echo "Bad option: $1"
+         usage;;
+    *) break;;
+  esac
+done
+
+if [ x$1 = x"" ]
+  then usage; fi
+
+sourcefiles=$@;
+
+}
+
+add_cppcattr() {
+
+if [ x$cppcattr == x"" ]
+  then cppcattr="-CPPC"
+  fi
+
+  cppcattr=$cppcattr","$1
+
+}
+
+includes="-I@CPPC_PATH@/include"
+grimoire=""
+cppcattr=""
+outputdir="cppc_output"
+pragmafile=""
+
+process_flags $*
+
+if [ x$grimoire != x"" ]
+  then add_cppcattr "FunctionGrimoire=${grimoire}"
+fi
+
+${JAVA} -Xmx512m -classpath ${CLASSPATH} ${CCCLASS} -antlr -preprocessor="@CPP@ ${includes}" -outdir=${outputdir} ${cppcattr} ${sourcefiles}

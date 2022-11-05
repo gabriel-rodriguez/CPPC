@@ -1,0 +1,49 @@
+--- init_configuration_action.old	2017-07-06 09:39:46.214941784 +0200
++++ init_configuration_action.cpp	2017-07-06 09:34:24.789605583 +0200
+@@ -18,6 +18,8 @@
+ 
+ #include <controller/actions/controller_helper.h>
+ #include <controller/actions/init_configuration_action.h>
++#include <data/cppc_basic.h>
++#include <data/data_type_factory.h>
+ #include <data/heap_context.h>
+ #include <util/configuration/configuration_manager.h>
+ #include <util/xml/plain_parser.h>
+@@ -25,6 +27,7 @@
+ 
+ #include <cassert>
+ 
++using cppc::data::DataTypeFactory;
+ using cppc::data::HeapContext;
+ using cppc::util::configuration::ConfigurationManager;
+ using cppc::util::configuration::ParameterType;
+@@ -66,6 +69,10 @@
+           return new PlainParser();
+       }
+ 
++      template <class T> DataType * createDataType() {
++        return new T;
++      }
++
+       int InitConfigurationAction::execute() {
+ 
+         assert( !controllerState.initConfig );
+@@ -73,6 +80,18 @@
+         // Register plain parser (ad-hoc fix)
+         XmlParserFactory::instance().registerParser( PlainParser::staticParserType(), createPlainParser );
+ 
++        // Register data types (ad-hoc fix)
++        DataTypeFactory::instance().registerDataType( cppc::data::CharacterType::typeIdentifier, cppc::data::CharacterType::staticSize(), createDataType<cppc::data::CharacterType> );
++        DataTypeFactory::instance().registerDataType( cppc::data::DoubleType::typeIdentifier, cppc::data::DoubleType::staticSize(), createDataType<cppc::data::DoubleType> );
++        DataTypeFactory::instance().registerDataType( cppc::data::FloatType::typeIdentifier, cppc::data::FloatType::staticSize(), createDataType<cppc::data::FloatType> );
++        DataTypeFactory::instance().registerDataType( cppc::data::IntegerType::typeIdentifier, cppc::data::IntegerType::staticSize(), createDataType<cppc::data::IntegerType> );
++        DataTypeFactory::instance().registerDataType( cppc::data::LongType::typeIdentifier, cppc::data::LongType::staticSize(), createDataType<cppc::data::LongType> );
++        DataTypeFactory::instance().registerDataType( cppc::data::ShortType::typeIdentifier, cppc::data::ShortType::staticSize(), createDataType<cppc::data::ShortType> );
++        DataTypeFactory::instance().registerDataType( cppc::data::UCharacterType::typeIdentifier, cppc::data::UCharacterType::staticSize(), createDataType<cppc::data::UCharacterType> );
++        DataTypeFactory::instance().registerDataType( cppc::data::UIntegerType::typeIdentifier, cppc::data::UIntegerType::staticSize(), createDataType<cppc::data::UIntegerType> );
++        DataTypeFactory::instance().registerDataType( cppc::data::ULongType::typeIdentifier, cppc::data::ULongType::staticSize(), createDataType<cppc::data::ULongType> );
++        DataTypeFactory::instance().registerDataType( cppc::data::UShortType::typeIdentifier, cppc::data::UShortType::staticSize(), createDataType<cppc::data::UShortType> );
++
+         // Initialization of the ConfigurationManager
+         initConfigurationManager( argsno, args );
+ 

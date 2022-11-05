@@ -1,0 +1,41 @@
+--- init_configuration_action.old	2017-07-12 14:34:02.198836361 +0200
++++ init_configuration_action.cpp	2017-07-12 14:36:29.765181786 +0200
+@@ -24,6 +24,8 @@
+ #include <util/configuration/configuration_manager.h>
+ #include <util/xml/plain_parser.h>
+ #include <util/xml/xml_parser_factory.h>
++#include <writer/io_hdf5_writer.h>
++#include <writer/writer_factory.h>
+ 
+ #include <cassert>
+ 
+@@ -34,6 +36,8 @@
+ using cppc::util::configuration::ParameterVector;
+ using cppc::util::xml::PlainParser;
+ using cppc::util::xml::XmlParserFactory;
++using cppc::writer::IOHdf5Writer;
++using cppc::writer::WriterFactory;
+ 
+ namespace cppc {
+   namespace controller {
+@@ -73,6 +77,10 @@
+         return new T;
+       }
+ 
++      Writer * createWriter() {
++          return new IOHdf5Writer();
++      }
++
+       int InitConfigurationAction::execute() {
+ 
+         assert( !controllerState.initConfig );
+@@ -92,6 +100,9 @@
+         DataTypeFactory::instance().registerDataType( cppc::data::ULongType::typeIdentifier, cppc::data::ULongType::staticSize(), createDataType<cppc::data::ULongType> );
+         DataTypeFactory::instance().registerDataType( cppc::data::UShortType::typeIdentifier, cppc::data::UShortType::staticSize(), createDataType<cppc::data::UShortType> );
+ 
++        // Register writer (ad-hoc fix)
++        WriterFactory::instance().registerWriter( IOHdf5Writer::staticWriterType().getStaticValue(), createWriter );
++
+         // Initialization of the ConfigurationManager
+         initConfigurationManager( argsno, args );
+ 

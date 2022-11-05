@@ -1,0 +1,428 @@
+CPPC@DOC@v0.8.1
+
+A. INSTALLATION
+________________________________________________________________________________
+
+To install CPPC on your computer, do the following:
+
+1/ Untar the archive and move into the CPPC directory.
+2/ Type "./configure" to check for system components needed to compile
+   different CPPC plugins. The following options are available:
+
+  --prefix=<path>           	Install CPPC files under <path> (see step 4).
+                            	Defaults to `pwd`/Build.
+  --disable-fortran         	Disable support for Fortran 77 applications.
+  --with-mpi=yes/no/<path>  	<path> to mpicc for MPI configuration. MPI is 
+			    	enabled by default. Note that compiling CPPC with 
+			    	MPI support will prevent the library from
+			    	checkpointing sequential applications (an error
+			    	complaining about MPI not being initialized will be
+			    	raised during runtime).
+  --with-hdf5=yes/no/<path> 	<path> to h5cc for HDF5 configuration. Disabling
+			    	the HDF5 writer currently renders the library
+			    	unusable and causes runtime errors.
+  --with-xerces=yes/no/<path>	Search for Xerces-C in <path>. Disabled by default
+			    	since CPPC 0.8.
+  --with-xerces-inc=<path>  	Search for Xerces include files under <path>.
+  --with-xerces-lib=<path>  	Search for Xerces library files under <path>.
+
+3/ Type "make" to build CPPC.
+
+4/ Typing "make install" will copy CPPC essential files to the destination
+   directory specified using the --prefix option when running ./configure. This
+   will create three subdirectories:
+
+   bin       Containing the compiler scripts.
+   include   Header files needed by other programs to use CPPC. These
+             include the C and Fortran interfaces (cppc.h and cppcf.h
+             respectively), various datatype definitions
+             (data/cppc_types.h), and the semantic files to direct
+             compiler operation.
+   lib       The shared libraries for CPPC, both C and Fortran 77
+             versions (libcppc-c.so and libcppc-f.so, respectively).
+
+
+B. USING CPPC
+________________________________________________________________________________
+
+In order to introduce fault-tolerance through CPPC, the code of your application
+needs to be changed so that it communicates with the runtime library, passing
+information about variables that need to be dumped in the next checkpoint, where
+to create the state files, etc. Also, flow-control structures are placed to
+control the re-execution of certain critical portions of code at restart. This
+will enable the recovery of certain non-portable parts of data, such as MPI
+communicators or open files, that cannot be just stored as binary data in a
+state file. As the insertion of these function calls and flow-control structures
+would imply significant effort by the end user, the CPPC runtime library is
+distributed along with a compiler that helps the user by automatically
+performing necessary transformations to the original application code. 
+
+The automatic communication analysis and checkpoint insertion sported from
+v0.7.x of the compiler are fairly stable, and a huge improvement over v0.6.x,
+but might still not work well with all applications. You can deactivate both and
+rely on manual directive insertion if you experience trouble with the analyses
+or the output code.
+
+The compiler-provided directives, in case the user wants to manually guide the
+compiler operation, are:
+
+  * cppc execute/end execute: These mark a block of code that needs to be
+    re-executed upon application restart. This directive should be
+    inserted when you want to recover state by re-execution, instead of
+    saving/reading it to/from disk.
+
+  * cppc checkpoint: This directive may be used for manually marking
+    points where the state is dumped to a state file. If so, it must be
+    inserted at safe points in the application: locations where there are
+    neither in-transit, nor orphan messages between processes. In a typical
+    example, a checkpoint should not be placed in between an MPI_Send()
+    and its matching MPI_Recv(). If this happened, the message would not
+    be resent upon application restart, but the destination process would
+    still expect to receive it.
+
+  * cppc checkpoint loop: This directive is the same as the previous one,
+    except that you mark a loop in whose body you want the checkpoint
+    inserted. The compiler will take into account communications between
+    processes and insert a checkpoint in the first safe point it can find
+    inside the loop body.
+
+Checkpoints are usually inserted inside loops. You usually won't expect a state
+file to be dumped at each loop iteration. Checkpoint frequency can be controlled
+by using the CPPC/Controller/Frequency parameter (see the EXAMPLE APPLICATION
+section).
+
+If the automatic checkpoint/communication analyses work for your application,
+then there is nothing you will need to manually alter in its code. Else, the
+steps that you want to take in order to integrate your application with the
+CPPC framework are:
+
+1/ Decide where you want to dump the state. Place checkpoint or checkpoint loop
+   directives in those spots. If the communication analysis is not used, be sure
+   to check that those spots are safe points as defined above. Bear in mind that
+   the code after a checkpoint and up to the end of the application will be the
+   code being executed upon application restart.
+
+2/ Compile the application linking with the appropriate CPPC dynamic library.
+
+C. UNDERSTANDING SEMANTIC DESCRIPTIONS OF FUNCTION FILES
+--------------------------------------------------------------------------------
+
+Some of the transforms implemented by the CPPC compiler are semantic-directed.
+These require certain semantic information about which function calls implement
+certain semantics and how. Since source code in imperative languages is not
+intrinsically semantic, it is necessary to provide semantic information to the
+compiler. The mechanism for supplying this information is extensible and not
+tied to specific implementations of a semantic, fulfilling the portability
+target present in CPPC.
+
+The compiler reads this semantic information from XML files having the following
+format:
+
+<cppc-semantic-module>
+
+  <module name="...">
+
+    <function name="...">
+
+      <!-- Block used for feeding the compiler with flow control
+           data, which improves the efficiency of the analysis for
+          variable registration. -->
+      <input parameters="..."/>
+      <output parameters="..."/>
+      <input-output parameters="..."/>
+
+      <!-- Block containing semantic information about the roles
+           this function fulfills. -->
+      <semantics>
+
+        <semantic role="...">
+          <attribute name="..." value="..."/>
+          <attribute .../>
+        </semantic>
+
+        <semantic ...   />
+
+      </semantics>
+
+    </function>
+
+    <function ... />
+
+  </module>
+
+</cppc-semantic-module>
+
+Take a look at the "linux-module.xml" in the "compiler/semantic-meta"
+subdirectory. Each of this files is called a "semantic module", and contains
+semantic information about a collection of related procedures. Each procedure
+can have any number of semantic tags, each one of them having a "role"
+identifier and, optionally, a number of attributes that give further information
+on how the procedure implements the given semantic.
+
+Look, for example, at the UNIX fopen and open functions. Both accept two
+parameters: a path string and modifiers on how to open the file, and both return
+a reference to the opened file. This information is passed to the compiler in
+the semantic description of the functions. This reference is different for each
+one of them, a FILE * for the fopen function and an integer for open. The given
+"DescriptorType" attribute tells the compiler which type of file descriptor does
+the function return.
+
+The current release of CPPC includes semantic modules for common POSIX functions,
+MPI, and common Fortran intrinsics. If you intend to provide support for a specific
+family of functions not included with CPPC, follow these steps:
+
+1/ Create a new XML file, and insert the necessary <cppc-semantic-module> and
+   <module> tags. Give the module a name that fits the function family which
+   documents.
+
+2/ Add the functions in that family (or simply the ones you need). For each
+   function, add a classification of its parameters in terms of data flow:
+   input/output/input-output.
+
+3/ Add the semantic roles to the relevant functions. Current recognized roles
+   are:
+
+   - CPPC/Nonportable: Identifies a procedure as having a non portable outcome,
+     which has to be recovered by code re-execution rather than by storing it
+     into the save file.
+
+   - CPPC/IO/Open and CPPC/IO/Close: For marking functions that open/close
+     sequential access streams. It is required if you want CPPC to automatically
+     track the state of such media. Attributes for the semantic role are the
+     "Path" to the file being opened, the "FileDescriptor" being returned and
+     its "DescriptorType". You can see an example in the semantic modules
+     bundled with this distribution.
+
+   - CPPC/Comm/Initializer: Used for identifying functions that initialize the
+     parallel system. Since CPPC might perform interprocess communications at
+     restart time, it needs to locate the point in the code where the comm
+     system is started.
+
+   - CPPC/Comm/Ranker: Used for identifying functions that return the rank of a
+     parallel process. It is necessary to correctly perform the communications
+     analysis.
+
+   - CPPC/Comm/Sizer: Used for identifying functions that return the size of
+     a communicator in a parallel execution. It is necessary to correctly
+     perform the communications analysis.
+
+4/ If your semantic module documents a widely used family of functions, please
+   send it to gabriel.rodriguez@udc.es so it can be added to the next version of
+   the CPPC compiler.
+
+
+D. EXAMPLE APPLICATION
+________________________________________________________________________________
+
+In the 'Example' directory there's an example application which solves an
+equation system using the Gauss-Jordan method. There are two different versions
+of this application. The system will build the appropriate one depending on
+whether you have chosen to build the MPI or the sequential version of CPPC.
+
+1/ Enter the 'Example' directory.
+
+2/ Execute 'make' to build all necessary targets.
+
+3/ The syntax accepted by the "gauss" executable:
+
+   gauss <dimA> <dimB> <file1> <file2> <file3>
+
+   Where:
+
+   dimA     Rows in the grid of processors.
+   dimB     Columns in the grid of processors.
+   file1    File containing the system matrix.
+   file2    File containing the independent vector.
+   file3    Output file.
+
+   Hence, if the equation system to be solved is A.b=x, then <file1>=A,
+   <file2>=b and x=<file3>.
+
+4/ Execution of the 'gauss' file automatically uses the CPPC library. To achieve
+   a suitable configuration for CPPC, a number of parameters must be defined. In
+   the 'Example' directory you will find a file called 'cppc_config.example'.
+   This is an XML configuration file. Edit it and change it at will. Every CPPC
+   plugin defines its own configuration parameters, and to allow for this the
+   XML is structured in modules and parameters. The list of currently accepted
+   options is:
+
+   Module: Controller
+     RootDir                    Directory where CPPC will store and search for
+                                checkpoint files.
+     ApplicationName            Subdirectory of "RootDir" where checkpoint files
+                                will be effectively stored.
+     Restart                    Controls whether the application must be
+                                restarted. It is highly recommended to set this
+                                to false, and enforce restart using command-line
+                                parameters.
+     Frequency                  Number of calls to CPPC_Do_checkpoint() between
+                                effective state dumping. Set to -1 to disable
+				checkpointing.
+     FullFrequency		Number of effective checkpoint dumps in between two
+				full checkpoints. Set to 1 to disable incremental
+				checkpointing.
+     CheckpointOnFirstTouch     If this is set to "true", the state dumping will
+                                be performed every first time that a particular
+                                call to CPPC_Do_checkpoint() is reached.
+     Suffix                     Suffix for the files being generated.
+     StoredRecoverySets		Maximum number of recovery sets stored (per node)
+				before beginning deletion of the older ones as new
+				ones are being created. A recovery set is composed
+				of a full checkpoint plus a number of incremental to
+				be applied on top of it. Set to 1 to store only the
+				latest recovery set (not recommended if using MPI).
+				Set to -1 to disable deletion of created checkpoints.
+     DeleteCheckpoints          If set to "true", stored checkpoints will
+                                be removed upon succesful execution.
+
+   Module: Writer
+     Type                       Type of writer used. See 4.1/.
+   Submodule: HDF-5
+     Compression                Type of compression used by the HDF-5 writer.
+                                See 4.2/.
+     CompressionLevel           Level of compression used by the ZLib
+                                compressor. It is an integer in the 0-9 range,
+                                9 being the maximum compression level.
+     MinimumSize                An integer defining the minimum data size for
+                                enabling compression. E.g., if set to 100, any
+                                array with less than a hundred elements will
+                                not be compressed, but stored directly.
+
+4.1/ Currently theres just one valid value for this parameter:
+      3                         HDF-5 writer.
+
+4.2/ Two valid values:
+      None                      No compression.
+      ZLib                      ZLib compression. When this is enabled, it is
+                                mandatory to also include the
+                                HDF-5/CompressionLevel and HDF-5/MinimumSize
+                                parameters.
+
+
+** NOTE: In order for CPPC to find the configuration file, copy it to
+   $HOME/.cppc_config, or use the CPPC/Configuration/FilePath command-line
+   parameter (see 5). A configuration file example can be found under
+   Example/cppc-config.example. 
+
+   For compatibility with older versions, CPPC also accepts XML configuration files.
+   An example of the equivalent XML configuration file can be found under
+   Example/cppc-config.xml. The DTD for the configuration file can be found under
+   include/util/xml/cppc-config.dtd. XML configuration files are deprecated and will
+   go away at some point.
+
+5/ CPPC accepts command-line parameters that overwrite those set in the configuration
+   file. Used syntaxis, supposing we are running the 'gauss' application, is:
+
+     gauss <gauss-params> -CPPC,<CPPC-Param1>,<CPPC-Param2>,...
+
+   Where every CPPC-Param has the following structure:
+
+     CPPC/<Module>/<Submodule>/.../<Parameter>=<value>
+
+   For instance, if we want to overwrite the configuration file placement to be
+   /tmp/cppc-config and command CPPC to restart the application, we will use:
+
+     gauss <gauss-params> -CPPC,CPPC/Configuration/FilePath=/tmp/cppc-config,\
+       CPPC/Controller/Restart=true
+
+   Any parameter seen in the configuration file can be overwritten using a
+   command-line parameter.
+
+   Please note that the Fortran 77 version of the compiler does not accept
+   command-line parameters, due to the Fortran 77 lack of a standard way for
+   accessing them. It will be implemented in future versions of CPPC, shall we
+   find a portable way to do it.
+
+E. COMPILER
+________________________________________________________________________________
+
+The compiler used by CPPC has been ported to the Cetus framework so that it is
+easier to use and more portable than the previous SUIF version in CPPC v0.1.x.
+Also, the Fortran 77 compiler is now working (however, the Fortran 77 parser is
+somehow experimental and won't parse any Fortan 77 code out there).
+
+Two script files, bin/cppc_cc and bin/cppc_fc will be copied to the installation
+directory. They run the C and Fortran 77 compilers, respectively. Executing
+them without parameters will give a brief description of its functionalities.
+
+Please note that the compiler, specially the Fortran 77 version, is highly
+experimental code. It is based on a custom Cetus distribution. Extensions have
+been made to the IR so that it supports Fortran 77 structures. Any bug report
+concerning the Fortran 77 compiler will be specially appreciated.
+
+F. KNOWN ISSUES
+_________________________________________________________________________________
+
+1/ Fortran code not yet accepted by the Fortran compiler:
+
+   - Octal numbers such as "0777". This number will get translated as "777"
+     instead of "511", resulting in code malfunction. If you are using any
+     octal integer representation, be sure to check the resulting code after
+     running the precompiler to correct this issue.
+
+   - "CONTINUE" statements. Ending a labeled loop with "<label> CONTINUE" is
+     ok, but executable "CONTINUE" statements are not yet supported. Note that
+     ending multiple loops with the same label with just one CONTINUE statement
+     is not yet supported.
+
+   - "ELSE IF" constructs. If you want to use an ELSEIF construct, write it
+     as "ELSEIF". Otherwise, the new if has to be properly closed with an
+     END IF (ENDIF) statement.
+
+2/ Compiler analyses might fail if a nonportable function is inserted into
+   a non-do loop (Fortran) or a non standard for loop (C) (being standard the
+   usual "for( var = value; <condition>; <step> )" construct.
+
+3/ Currently the CPPC framework does only support the Unix standard filesystem,
+   described in headers "fcntl.h", "sys/stat.h", "sys/types.h" and "unistd.ht".
+   If you are interested in an adapter for other filesystems, please send
+   a petition.
+
+4/ CPPC needs the HDF-5 libraries to be installed in order to build a checkpoint
+   writer. If it cannot find HDF-5 execution will fail when trying to create
+   checkpoint files.
+
+5/ The Fortran compiler used to build the Fortran 77 interface needs to
+   implement the FSEEK GNU intrinsic, in order to be able to reposition files
+   upon application restart. For this reason, the Fortran interface in CPPC is
+   not compatible with GCC4 below v4.3 (it works with GCC3 and g77, though).
+
+G. COPYRIGHT NOTICES
+_________________________________________________________________________________
+
+- This distribution includes a modified copy of the Cetus 0.5 Standard
+  Version, by Troy A. Johnson and Sang-Ik Lee. Modifications were done to
+  include Fortran support and adapt it to the CPPC compiler. A copy of the
+  current Cetus Standard Version can be obtained at:
+
+    http://cetus.ecn.purdue.edu/
+
+  A copy of the Cetus License can be found under compiler/lib/cetus-license.
+
+- This distribution includes a copy of the Antlr software by Terence Parr. It
+  also uses this software, and software generated by the Antlr framework, for
+  source-to-source transformations. A copy of the current Antlr distribution
+  can be obtained at:
+
+    http://www.antlr.org
+
+H. LICENSE
+_________________________________________________________________________________
+
+This program is free software; you can redistribute it and/or modify it under the
+terms of the GNU General Public License as published by the Free Software Foundation;
+either version 2 of the License, or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+A copy of the GNU General Public License should be located in the 'License' file;
+if not, write to the Free Software Foundation, Inc., 59 Temple Place, Suite 330,
+Boston, MA 02111-1307 USA.
+
+I. CONTACTING AUTHORS
+_________________________________________________________________________________
+
+This implementation of the CPPC framework has been done by Gabriel Rodríguez.
+Send feedback to 'gabriel.rodriguez@udc.es'.

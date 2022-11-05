@@ -1,0 +1,64 @@
+<!--  This file is part of CPPC.
+
+      CPPC is free software; you can redistribute it and/or modify
+      it under the terms of the GNU General Public License as published by
+      the Free Software Foundation; either version 2 of the License, or
+      (at your option) any later version.
+
+      CPPC is distributed in the hope that it will be useful,
+      but WITHOUT ANY WARRANTY; without even the implied warranty of
+      MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+      GNU General Public License for more details.
+
+      You should have received a copy of the GNU General Public License
+      along with CPPC; if not, write to the Free Software
+      Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+-->
+
+
+<!-- JDBC Driver -->
+<!-- PostgreSQL -->
+<!--
+<property name="jdbcdriver.home" value="/usr/share/postgresql/lib/"/>
+<property name="jdbcdriver.jars" value="postgresql.jar"/>
+
+<property name="jdbcdriver.className" value="org.postgresql.Driver"/>
+<property name="jdbcdriver.url" value="jdbc:postgresql://localhost/mem"/>
+<property name="jdbcdriver.databaseName" value="PostgreSQL"/>
+
+<property name="jdbcdriver.user" value="mem"/>
+<property name="jdbcdriver.password" value="mem"/>
+-->
+<!--Tomcat-->
+<!--
+<property name="tomcat.home" value="/home/gabriel/Programas/Tomcat/jakarta-tomcat-5.5.7/"/>
+<property name="tomcat.webapps" value="${tomcat.home}/webapps/"/>
+-->
+<!-- Axis -->
+<!--
+<property name="axis.home" value="/home/gabriel/Programas/Axis/axis-1_2RC2/"/>
+<property name="axis.lib" value="${axis.home}/lib"/>
+<property name="axis.jars" value="axis.jar, commons-discovery.jar, commons-logging.jar, jaxrpc.jar,
+                                  log4j-1.2.8.jar, saaj.jar, wsdl4j.jar"/>
+-->				  
+
+<!-- Host and port of the WS -->
+<!--
+<property name="ws.host" value="localhost"/>
+<property name="ws.port" value="8080"/>
+-->
+
+<!-- CPPCC Properties -->
+<!--
+<property name="mem.name" value="MEM"/>
+<property name="propertiesconfiguration.home" value="${mem.home}/PropertiesConfiguration"/>
+-->
+<property name="cppcc.sources" value="${cppcc.home}/Sources"/>
+<property name="cppcc.libs" value="${cppcc.home}/lib"/>
+
+
+<!-- Java Compiler Flags -->
+<property name="build.compiler" value="modern"/>
+<property name="javac.debug" value="true"/>
+<property name="javac.optimize" value="off"/>
+<property name="javac.deprecation" value="off"/>

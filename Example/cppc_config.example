@@ -1,0 +1,14 @@
+CPPC/Controller/RootDir=/tmp/CPPC_Files
+CPPC/Controller/ApplicationName=gauss
+CPPC/Controller/Restart=false
+CPPC/Controller/Frequency=100
+CPPC/Controller/FullFrequency=5
+CPPC/Controller/CheckpointOnFirstTouch=true
+CPPC/Controller/Suffix=.cppc
+CPPC/Controller/StoredRecoverySets=5
+CPPC/Controller/DeleteCheckpoints=false
+
+CPPC/Writer/Type=3
+CPPC/Writer/HDF-5/Compression=None
+CPPC/Writer/HDF-5/CompressionLevel=4
+CPPC/Writer/HDF-5/MinimumSize=100
